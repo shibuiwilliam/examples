@@ -12,20 +12,24 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
+package org.tensorflow.lite.examples.transfer.api
 
-package org.tensorflow.lite.examples.transfer.api;
+import java.io.IOException
 
-import java.io.IOException;
+/** Interface for model loaders: objects that handle loading different parts of the model.  */
+interface ModelLoader {
+    @Throws(IOException::class)
+    fun loadInitializeModel(): LiteModelWrapper
 
-/** Interface for model loaders: objects that handle loading different parts of the model. */
-public interface ModelLoader {
-  LiteModelWrapper loadInitializeModel() throws IOException;
+    @Throws(IOException::class)
+    fun loadBaseModel(): LiteModelWrapper
 
-  LiteModelWrapper loadBaseModel() throws IOException;
+    @Throws(IOException::class)
+    fun loadTrainModel(): LiteModelWrapper
 
-  LiteModelWrapper loadTrainModel() throws IOException;
+    @Throws(IOException::class)
+    fun loadInferenceModel(): LiteModelWrapper
 
-  LiteModelWrapper loadInferenceModel() throws IOException;
-
-  LiteModelWrapper loadOptimizerModel() throws IOException;
+    @Throws(IOException::class)
+    fun loadOptimizerModel(): LiteModelWrapper
 }
