@@ -253,12 +253,12 @@ class CameraFragment : Fragment() {
 
     override fun onActivityCreated(bundle: Bundle?) {
         super.onActivityCreated(bundle)
-        class CLossConsumer(val cViewModel: CameraFragmentViewModel): LossConsumer{
+        class CLossConsumer(): LossConsumer{
             override fun onLoss(epoch: Int, loss: Float) {
-                cViewModel.setLastLoss(loss)
+                viewModel!!.setLastLoss(loss)
             }
         }
-        val cLossConsumer = CLossConsumer(viewModel!!)
+        val cLossConsumer = CLossConsumer()
         viewModel!!
                 .getTrainingState()
                 .observe(
