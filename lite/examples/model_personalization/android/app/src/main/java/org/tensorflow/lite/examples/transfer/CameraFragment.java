@@ -290,7 +290,7 @@ public class CameraFragment extends Fragment {
     }
 
     ChipGroup chipGroup = (ChipGroup) rootView.findViewById(R.id.mode_chip_group);
-    if (viewModel.getCaptureMode().getValue()) {
+    if (viewModel.captureMode.getValue()) {
       ((Chip) rootView.findViewById(R.id.capture_mode_chip)).setChecked(true);
     } else {
       ((Chip) rootView.findViewById(R.id.inference_mode_chip)).setChecked(true);
@@ -327,7 +327,7 @@ public class CameraFragment extends Fragment {
               switch (trainingState) {
                 case STARTED:
                   tlModel.enableTraining((epoch, loss) -> viewModel.setLastLoss(loss));
-                  if (!viewModel.getInferenceSnackbarWasDisplayed().getValue()) {
+                  if (!viewModel.inferenceSnackbarWasDisplayed.getValue()) {
                     Snackbar.make(
                             getActivity().findViewById(R.id.classes_bar),
                             R.string.switch_to_inference_hint,
