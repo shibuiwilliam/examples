@@ -50,7 +50,7 @@ internal class LiteTrainHeadModel(private val modelWrapper: LiteModelWrapper?) :
                     modelWrapper.interpreter.inputTensorCount - 1,
                     modelParameters.size)
         }
-        val lossBuffer = ByteBuffer.allocateDirect(FLOAT_BYTES)
+        val lossBuffer = ByteBuffer.allocateDirect(Constants.FLOAT_BYTES)
         lossBuffer.order(ByteOrder.nativeOrder())
         val outputs: MutableMap<Int, Any?> = TreeMap()
         outputs[0] = lossBuffer
@@ -106,9 +106,4 @@ internal class LiteTrainHeadModel(private val modelWrapper: LiteModelWrapper?) :
     override fun close() {
         modelWrapper!!.close()
     }
-
-    companion object {
-        private const val FLOAT_BYTES = 4
-    }
-
 }

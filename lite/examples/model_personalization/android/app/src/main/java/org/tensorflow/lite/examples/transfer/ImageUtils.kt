@@ -22,7 +22,6 @@ object ImageUtils {
     // TODO(b/137790961) reduce code duplication between different TFLite examples.
     // This value is 2 ^ 18 - 1, and is used to clamp the RGB values before their ranges
     // are normalized to eight bits.
-    const val MAX_CHANNEL_VALUE = 262143
     fun convertYUV420SPToARGB8888(input: ByteArray, width: Int, height: Int, output: IntArray) {
         val frameSize = width * height
         var j = 0
@@ -66,9 +65,9 @@ object ImageUtils {
         var b = y1192 + 2066 * u
 
         // Clipping RGB values to be inside boundaries [ 0 , MAX_CHANNEL_VALUE ]
-        r = if (r > MAX_CHANNEL_VALUE) MAX_CHANNEL_VALUE else Math.max(r, 0)
-        g = if (g > MAX_CHANNEL_VALUE) MAX_CHANNEL_VALUE else Math.max(g, 0)
-        b = if (b > MAX_CHANNEL_VALUE) MAX_CHANNEL_VALUE else Math.max(b, 0)
+        r = if (r > Constants.MAX_CHANNEL_VALUE) Constants.MAX_CHANNEL_VALUE else Math.max(r, 0)
+        g = if (g > Constants.MAX_CHANNEL_VALUE) Constants.MAX_CHANNEL_VALUE else Math.max(g, 0)
+        b = if (b > Constants.MAX_CHANNEL_VALUE) Constants.MAX_CHANNEL_VALUE else Math.max(b, 0)
         return -0x1000000 or (r shl 6 and 0xff0000) or (g shr 2 and 0xff00) or (b shr 10 and 0xff)
     }
 
@@ -89,7 +88,9 @@ object ImageUtils {
             val pUV = uvRowStride * (j shr 1)
             for (i in 0 until width) {
                 val uvOffset = pUV + (i shr 1) * uvPixelStride
-                out[yp++] = yuv2Rgb(0xff and yData[pY + i].toInt(), 0xff and uData[uvOffset].toInt(), 0xff and vData[uvOffset].toInt())
+                out[yp++] = yuv2Rgb(0xff and yData[pY + i].toInt(),
+                        0xff and uData[uvOffset].toInt(),
+                        0xff and vData[uvOffset].toInt())
             }
         }
     }

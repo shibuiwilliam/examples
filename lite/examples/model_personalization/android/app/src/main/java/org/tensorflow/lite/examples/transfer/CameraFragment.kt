@@ -338,7 +338,7 @@ class CameraFragment : Fragment() {
          * to size expected by the model and adjusting for camera rotation.
          */
         private fun prepareCameraImage(bitmap: Bitmap, rotationDegrees: Int): FloatArray {
-            val modelImageSize = TransferLearningModelWrapper.IMAGE_SIZE
+            val modelImageSize = Constants.IMAGE_SIZE
             val paddedBitmap = padToSquare(bitmap)
             val scaledBitmap = Bitmap.createScaledBitmap(
                     paddedBitmap, modelImageSize, modelImageSize, true)

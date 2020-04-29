@@ -79,8 +79,4 @@ class LiteOptimizerModel internal constructor(private val modelWrapper: LiteMode
         modelWrapper!!.close()
     }
 
-    companion object {
-        private const val FLOAT_BYTES = 4
-    }
-
 }

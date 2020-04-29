@@ -3,6 +3,7 @@ package org.tensorflow.lite.examples.transfer
 
 import android.content.Context
 import android.content.res.AssetManager
+import org.tensorflow.lite.examples.transfer.api.Constants
 import org.tensorflow.lite.examples.transfer.api.LiteModelWrapper
 import org.tensorflow.lite.examples.transfer.api.ModelLoader
 import java.io.FileInputStream
@@ -14,29 +15,13 @@ import java.nio.channels.FileChannel
 class AssetModelLoader(context: Context, private val directoryName: String) : ModelLoader {
     private val assetManager: AssetManager
 
-    @Throws(IOException::class)
-    override fun loadInitializeModel(): LiteModelWrapper {
-        return LiteModelWrapper(loadMappedFile("initialize.tflite"))
-    }
-
-    @Throws(IOException::class)
-    override fun loadBaseModel(): LiteModelWrapper {
-        return LiteModelWrapper(loadMappedFile("bottleneck.tflite"))
-    }
-
-    @Throws(IOException::class)
-    override fun loadTrainModel(): LiteModelWrapper {
-        return LiteModelWrapper(loadMappedFile("train_head.tflite"))
-    }
-
-    @Throws(IOException::class)
-    override fun loadInferenceModel(): LiteModelWrapper {
-        return LiteModelWrapper(loadMappedFile("inference.tflite"))
-    }
-
-    @Throws(IOException::class)
-    override fun loadOptimizerModel(): LiteModelWrapper {
-        return LiteModelWrapper(loadMappedFile("optimizer.tflite"))
+    /**
+     * Create a loader for a transfer learning model under given directory.
+     *
+     * @param directoryName path to model directory in assets tree.
+     */
+    init {
+        assetManager = context.assets
     }
 
     @Throws(IOException::class)
@@ -49,12 +34,29 @@ class AssetModelLoader(context: Context, private val directoryName: String) : Mo
         return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength)
     }
 
-    /**
-     * Create a loader for a transfer learning model under given directory.
-     *
-     * @param directoryName path to model directory in assets tree.
-     */
-    init {
-        assetManager = context.assets
+    @Throws(IOException::class)
+    override fun loadInitializeModel(): LiteModelWrapper {
+        return LiteModelWrapper(loadMappedFile(Constants.INITIALIZE_TFLITE))
     }
+
+    @Throws(IOException::class)
+    override fun loadBaseModel(): LiteModelWrapper {
+        return LiteModelWrapper(loadMappedFile(Constants.BOTTLENECK_TFLITE))
+    }
+
+    @Throws(IOException::class)
+    override fun loadTrainModel(): LiteModelWrapper {
+        return LiteModelWrapper(loadMappedFile(Constants.TRAIN_HEAD_TFLITE))
+    }
+
+    @Throws(IOException::class)
+    override fun loadInferenceModel(): LiteModelWrapper {
+        return LiteModelWrapper(loadMappedFile(Constants.INFERENCE_TFLITE))
+    }
+
+    @Throws(IOException::class)
+    override fun loadOptimizerModel(): LiteModelWrapper {
+        return LiteModelWrapper(loadMappedFile(Constants.OPTIMIZER_TFLITE))
+    }
+
 }

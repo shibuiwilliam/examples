@@ -27,7 +27,7 @@ internal class LiteInitializeModel(private val modelWrapper: LiteModelWrapper?) 
      * @param modelParameters where to store the model outputs.
      */
     fun initializeParameters(modelParameters: Array<ByteBuffer?>) {
-        val zero = ByteBuffer.allocateDirect(FLOAT_BYTES)
+        val zero = ByteBuffer.allocateDirect(Constants.FLOAT_BYTES)
         zero.order(ByteOrder.nativeOrder())
         zero.putFloat(0, 0f)
         val outputs: MutableMap<Int, Any?> = TreeMap()
@@ -43,9 +43,4 @@ internal class LiteInitializeModel(private val modelWrapper: LiteModelWrapper?) 
     override fun close() {
         modelWrapper!!.close()
     }
-
-    companion object {
-        private const val FLOAT_BYTES = 4
-    }
-
 }

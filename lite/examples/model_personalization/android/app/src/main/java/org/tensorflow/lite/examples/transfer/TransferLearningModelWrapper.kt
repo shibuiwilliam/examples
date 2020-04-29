@@ -40,13 +40,15 @@ class TransferLearningModelWrapper internal constructor(context: Context?) : Clo
 
     init {
         model = TransferLearningModel(
-                AssetModelLoader(context!!, "model"),
-                Arrays.asList("1", "2", "3", "4"))
+                AssetModelLoader(context!!, Constants.MODEL_DIR),
+                List<String>(Constants.NUM_CLASSES){it -> (it+1).toString()}
+//                Arrays.asList("1", "2", "3", "4")
+        )
         Thread(Runnable {
             while (!Thread.interrupted()) {
                 shouldTrain.block()
                 try {
-                    model.train(1, lossConsumer).get()
+                    model.train(Constants.NUM_EPOCHS, lossConsumer).get()
                 } catch (e: ExecutionException) {
                     throw RuntimeException("Exception occurred during model training", e.cause)
                 } catch (e: InterruptedException) {
@@ -90,10 +92,6 @@ class TransferLearningModelWrapper internal constructor(context: Context?) : Clo
     /** Frees all model resources and shuts down all background threads.  */
     override fun close() {
         model.close()
-    }
-
-    companion object {
-        const val IMAGE_SIZE = 224
     }
 
 }

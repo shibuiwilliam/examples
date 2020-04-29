@@ -38,6 +38,10 @@ class LiteModelWrapper private constructor(model: ByteBuffer) : Closeable {
      */
     constructor(model: MappedByteBuffer) : this(model as ByteBuffer) {}
 
+    init {
+        interpreter = Interpreter(model)
+    }
+
     override fun close() {
         interpreter.close()
     }
@@ -52,7 +56,4 @@ class LiteModelWrapper private constructor(model: ByteBuffer) : Closeable {
         }
     }
 
-    init {
-        interpreter = Interpreter(model)
-    }
 }

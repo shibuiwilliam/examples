@@ -85,9 +85,9 @@ task downloadModel(type: DefaultTask) {
         ant.mkdir(dir: modelTargetLocation)
         // If you want to use your own models rather than pre-built models,
         // comment out the following three lines.
-        ant.get(src: modelUrl, dest: modelArchivePath)
-        ant.unzip(src: modelArchivePath, dest: modelTargetLocation)
-        ant.delete(file: modelArchivePath)
+//        ant.get(src: modelUrl, dest: modelArchivePath)
+//        ant.unzip(src: modelArchivePath, dest: modelTargetLocation)
+//        ant.delete(file: modelArchivePath)
     }
 }
 

@@ -97,6 +97,54 @@ class TransferLearningModel(modelLoader: ModelLoader, classes: Collection<String
     @Volatile
     private var isTerminating = false
 
+
+    init {
+        classesByIdx = classes.toTypedArray()
+        this.classes = TreeMap()
+        for (classIdx in classes.indices) {
+            this.classes[classesByIdx[classIdx]] = classIdx
+        }
+        try {
+            initializeModel = LiteInitializeModel(modelLoader.loadInitializeModel())
+            bottleneckModel = LiteBottleneckModel(modelLoader.loadBaseModel())
+            trainHeadModel = LiteTrainHeadModel(modelLoader.loadTrainModel())
+            inferenceModel = LiteInferenceModel(modelLoader.loadInferenceModel(), classes.size)
+            optimizerModel = LiteOptimizerModel(modelLoader.loadOptimizerModel())
+        } catch (e: IOException) {
+            throw RuntimeException("Couldn't read underlying models for TransferLearningModel", e)
+        }
+        bottleneckShape = bottleneckModel!!.bottleneckShape
+        val modelParameterSizes = trainHeadModel!!.parameterSizes
+        modelParameters = arrayOfNulls(modelParameterSizes.size)
+        modelGradients = arrayOfNulls(modelParameterSizes.size)
+        nextModelParameters = arrayOfNulls(modelParameterSizes.size)
+        for (parameterIndex in modelParameterSizes.indices) {
+            val bufferSize = modelParameterSizes[parameterIndex] * Constants.FLOAT_BYTES
+            modelParameters[parameterIndex] = allocateBuffer(bufferSize)
+            modelGradients[parameterIndex] = allocateBuffer(bufferSize)
+            nextModelParameters[parameterIndex] = allocateBuffer(bufferSize)
+        }
+        initializeModel!!.initializeParameters(modelParameters)
+        val optimizerStateElementSizes = optimizerModel!!.stateElementSizes()
+        optimizerState = arrayOfNulls(optimizerStateElementSizes.size)
+        nextOptimizerState = arrayOfNulls(optimizerStateElementSizes.size)
+        for (elemIdx in optimizerState.indices) {
+            val bufferSize = optimizerStateElementSizes[elemIdx] * Constants.FLOAT_BYTES
+            optimizerState[elemIdx] = allocateBuffer(bufferSize)
+            nextOptimizerState[elemIdx] = allocateBuffer(bufferSize)
+            fillBufferWithZeros(optimizerState[elemIdx])
+        }
+        trainingBatchBottlenecks = allocateBuffer(trainBatchSize * numBottleneckFeatures() * Constants.FLOAT_BYTES)
+        val batchClassesNumElements = trainBatchSize * classes.size
+        trainingBatchClasses = allocateBuffer(batchClassesNumElements * Constants.FLOAT_BYTES)
+        zeroBatchClasses = allocateBuffer(batchClassesNumElements * Constants.FLOAT_BYTES)
+        for (idx in 0 until batchClassesNumElements) {
+            zeroBatchClasses.putFloat(0f)
+        }
+        zeroBatchClasses.rewind()
+        inferenceBottleneck = allocateBuffer(numBottleneckFeatures() * Constants.FLOAT_BYTES)
+    }
+
     /**
      * Adds a new sample for training.
      *
@@ -113,7 +161,7 @@ class TransferLearningModel(modelLoader: ModelLoader, classes: Collection<String
                     "Class \"%s\" is not one of the classes recognized by the model", className)
         }
         return executor.submit<Void?> {
-            val imageBuffer = allocateBuffer(image.size * FLOAT_BYTES)
+            val imageBuffer = allocateBuffer(image.size * Constants.FLOAT_BYTES)
             for (f in image) {
                 imageBuffer.putFloat(f)
             }
@@ -165,7 +213,7 @@ class TransferLearningModel(modelLoader: ModelLoader, classes: Collection<String
                             sample.bottleneck!!.rewind()
 
                             // Fill trainingBatchClasses with one-hot.
-                            val position = (sampleIdx * classes.size + classes[sample.className]!!) * FLOAT_BYTES
+                            val position = (sampleIdx * classes.size + classes[sample.className]!!) * Constants.FLOAT_BYTES
                             trainingBatchClasses.putFloat(position, 1f)
                         }
                         trainingBatchBottlenecks.rewind()
@@ -221,7 +269,7 @@ class TransferLearningModel(modelLoader: ModelLoader, classes: Collection<String
             if (isTerminating) {
                 return null
             }
-            val imageBuffer = allocateBuffer(image.size * FLOAT_BYTES)
+            val imageBuffer = allocateBuffer(image.size * Constants.FLOAT_BYTES)
             for (f in image) {
                 imageBuffer.putFloat(f)
             }
@@ -374,8 +422,6 @@ class TransferLearningModel(modelLoader: ModelLoader, classes: Collection<String
     }
 
     companion object {
-        private const val FLOAT_BYTES = 4
-
         // Setting this to a higher value allows to calculate bottlenecks for more samples while
         // adding them to the bottleneck collection is blocked by an active training thread.
         private val NUM_THREADS = Math.max(1, Runtime.getRuntime().availableProcessors() - 1)
@@ -402,50 +448,4 @@ class TransferLearningModel(modelLoader: ModelLoader, classes: Collection<String
         }
     }
 
-    init {
-        classesByIdx = classes.toTypedArray()
-        this.classes = TreeMap()
-        for (classIdx in classes.indices) {
-            this.classes[classesByIdx[classIdx]] = classIdx
-        }
-        try {
-            initializeModel = LiteInitializeModel(modelLoader.loadInitializeModel())
-            bottleneckModel = LiteBottleneckModel(modelLoader.loadBaseModel())
-            trainHeadModel = LiteTrainHeadModel(modelLoader.loadTrainModel())
-            inferenceModel = LiteInferenceModel(modelLoader.loadInferenceModel(), classes.size)
-            optimizerModel = LiteOptimizerModel(modelLoader.loadOptimizerModel())
-        } catch (e: IOException) {
-            throw RuntimeException("Couldn't read underlying models for TransferLearningModel", e)
-        }
-        bottleneckShape = bottleneckModel!!.bottleneckShape
-        val modelParameterSizes = trainHeadModel!!.parameterSizes
-        modelParameters = arrayOfNulls(modelParameterSizes!!.size)
-        modelGradients = arrayOfNulls(modelParameterSizes!!.size)
-        nextModelParameters = arrayOfNulls(modelParameterSizes!!.size)
-        for (parameterIndex in modelParameterSizes!!.indices) {
-            val bufferSize = modelParameterSizes!![parameterIndex] * FLOAT_BYTES
-            modelParameters[parameterIndex] = allocateBuffer(bufferSize)
-            modelGradients[parameterIndex] = allocateBuffer(bufferSize)
-            nextModelParameters[parameterIndex] = allocateBuffer(bufferSize)
-        }
-        initializeModel!!.initializeParameters(modelParameters)
-        val optimizerStateElementSizes = optimizerModel!!.stateElementSizes()
-        optimizerState = arrayOfNulls(optimizerStateElementSizes.size)
-        nextOptimizerState = arrayOfNulls(optimizerStateElementSizes.size)
-        for (elemIdx in optimizerState.indices) {
-            val bufferSize = optimizerStateElementSizes[elemIdx] * FLOAT_BYTES
-            optimizerState[elemIdx] = allocateBuffer(bufferSize)
-            nextOptimizerState[elemIdx] = allocateBuffer(bufferSize)
-            fillBufferWithZeros(optimizerState[elemIdx])
-        }
-        trainingBatchBottlenecks = allocateBuffer(trainBatchSize * numBottleneckFeatures() * FLOAT_BYTES)
-        val batchClassesNumElements = trainBatchSize * classes.size
-        trainingBatchClasses = allocateBuffer(batchClassesNumElements * FLOAT_BYTES)
-        zeroBatchClasses = allocateBuffer(batchClassesNumElements * FLOAT_BYTES)
-        for (idx in 0 until batchClassesNumElements) {
-            zeroBatchClasses.putFloat(0f)
-        }
-        zeroBatchClasses.rewind()
-        inferenceBottleneck = allocateBuffer(numBottleneckFeatures() * FLOAT_BYTES)
-    }
 }

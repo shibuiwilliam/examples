@@ -32,7 +32,7 @@ internal class LiteBottleneckModel(private val modelWrapper: LiteModelWrapper?) 
     fun generateBottleneck(image: ByteBuffer, outBottleneck: ByteBuffer?): ByteBuffer? {
         var outBottleneck = outBottleneck
         if (outBottleneck == null) {
-            outBottleneck = ByteBuffer.allocateDirect(numBottleneckFeatures * FLOAT_BYTES)
+            outBottleneck = ByteBuffer.allocateDirect(numBottleneckFeatures * Constants.FLOAT_BYTES)
         }
         modelWrapper!!.interpreter.run(image, outBottleneck)
         image.rewind()
@@ -48,10 +48,6 @@ internal class LiteBottleneckModel(private val modelWrapper: LiteModelWrapper?) 
 
     override fun close() {
         modelWrapper!!.close()
-    }
-
-    companion object {
-        private const val FLOAT_BYTES = 4
     }
 
 }

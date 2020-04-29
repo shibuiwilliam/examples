@@ -134,11 +134,8 @@ class CameraFragmentViewModel : ViewModel() {
     fun increaseNumSamples(className: String) {
         val map = numSamples.value!!
         val currentNumber: Int
-        currentNumber = if (map.containsKey(className)) {
-            map[className]!!
-        } else {
-            0
-        }
+        currentNumber = if (map.containsKey(className)) map[className]!! else 0
+
         map[className] = currentNumber + 1
         numSamples.postValue(map)
     }

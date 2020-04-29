@@ -21,7 +21,7 @@ import java.util.*
 
 internal class LiteInferenceModel(private val modelWrapper: LiteModelWrapper?, private val numClasses: Int) : Closeable {
     fun runInference(bottleneck: ByteBuffer?, modelParameters: Array<ByteBuffer?>): FloatArray {
-        val predictionsBuffer = ByteBuffer.allocateDirect(numClasses * FLOAT_BYTES)
+        val predictionsBuffer = ByteBuffer.allocateDirect(numClasses * Constants.FLOAT_BYTES)
         predictionsBuffer.order(ByteOrder.nativeOrder())
         val outputs: MutableMap<Int, Any> = TreeMap()
         outputs[0] = predictionsBuffer
@@ -43,10 +43,6 @@ internal class LiteInferenceModel(private val modelWrapper: LiteModelWrapper?, p
 
     override fun close() {
         modelWrapper!!.close()
-    }
-
-    companion object {
-        private const val FLOAT_BYTES = 4
     }
 
 }
