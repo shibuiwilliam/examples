@@ -38,6 +38,24 @@ class TransferLearningModelWrapper internal constructor(context: Context?) : Clo
     @Volatile
     private var lossConsumer: LossConsumer? = null
 
+    init {
+        model = TransferLearningModel(
+                AssetModelLoader(context!!, "model"),
+                Arrays.asList("1", "2", "3", "4"))
+        Thread(Runnable {
+            while (!Thread.interrupted()) {
+                shouldTrain.block()
+                try {
+                    model.train(1, lossConsumer).get()
+                } catch (e: ExecutionException) {
+                    throw RuntimeException("Exception occurred during model training", e.cause)
+                } catch (e: InterruptedException) {
+                    // no-op
+                }
+            }
+        }).start()
+    }
+
     // This method is thread-safe.
     fun addSample(image: FloatArray?, className: String?): Future<Void?> {
         return model.addSample(image!!, className!!)
@@ -78,20 +96,4 @@ class TransferLearningModelWrapper internal constructor(context: Context?) : Clo
         const val IMAGE_SIZE = 224
     }
 
-    init {
-        model = TransferLearningModel(
-                AssetModelLoader(context!!, "model"), Arrays.asList("1", "2", "3", "4"))
-        Thread(Runnable {
-            while (!Thread.interrupted()) {
-                shouldTrain.block()
-                try {
-                    model.train(1, lossConsumer).get()
-                } catch (e: ExecutionException) {
-                    throw RuntimeException("Exception occurred during model training", e.cause)
-                } catch (e: InterruptedException) {
-                    // no-op
-                }
-            }
-        }).start()
-    }
 }
