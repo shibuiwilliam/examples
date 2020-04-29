@@ -16,7 +16,7 @@ package org.tensorflow.lite.examples.transfer
 
 import android.content.Context
 import android.os.ConditionVariable
-import org.tensorflow.lite.examples.transfer.api.AssetModelLoader
+import org.tensorflow.lite.examples.transfer.AssetModelLoader
 import org.tensorflow.lite.examples.transfer.api.TransferLearningModel
 import org.tensorflow.lite.examples.transfer.api.TransferLearningModel.LossConsumer
 import java.io.Closeable

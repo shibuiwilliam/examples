@@ -1,28 +1,17 @@
-/* Copyright 2019 The TensorFlow Authors. All Rights Reserved.
+package org.tensorflow.lite.examples.transfer
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-==============================================================================*/
-package org.tensorflow.lite.examples.transfer.api
 
 import android.content.Context
 import android.content.res.AssetManager
+import org.tensorflow.lite.examples.transfer.api.LiteModelWrapper
+import org.tensorflow.lite.examples.transfer.api.ModelLoader
 import java.io.FileInputStream
 import java.io.IOException
 import java.nio.MappedByteBuffer
 import java.nio.channels.FileChannel
 
 /** Handles loading various parts of the model stored as a directory under Android assets.  */
-open class AssetModelLoader(context: Context, private val directoryName: String) : ModelLoader {
+class AssetModelLoader(context: Context, private val directoryName: String) : ModelLoader {
     private val assetManager: AssetManager
 
     @Throws(IOException::class)
