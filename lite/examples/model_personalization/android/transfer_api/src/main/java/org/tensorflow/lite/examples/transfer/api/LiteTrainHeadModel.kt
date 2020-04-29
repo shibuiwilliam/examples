@@ -89,14 +89,14 @@ internal class LiteTrainHeadModel(private val modelWrapper: LiteModelWrapper?) :
     val parameterShapes: Array<IntArray?>
         get() {
             val interpreter = modelWrapper!!.interpreter
-            val parameterShapes = arrayOfNulls<IntArray>(interpreter!!.inputTensorCount - 2)
+            val parameterShapes = arrayOfNulls<IntArray>(interpreter.inputTensorCount - 2)
             for (inputIndex in 2 until interpreter.inputTensorCount) {
                 val inputTensor = interpreter.getInputTensor(inputIndex)
                 parameterShapes[inputIndex - 2] = IntArray(inputTensor.numDimensions())
                 System.arraycopy(
                         inputTensor.shape(),
                         0,
-                        parameterShapes[inputIndex - 2],
+                        parameterShapes[inputIndex - 2]!!,
                         0,
                         inputTensor.numDimensions())
             }
