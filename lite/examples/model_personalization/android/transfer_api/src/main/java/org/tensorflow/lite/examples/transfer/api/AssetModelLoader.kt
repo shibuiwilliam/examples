@@ -1,4 +1,4 @@
-package org.tensorflow.lite.examples.transfer
+package org.tensorflow.lite.examples.transfer.api
 
 
 import android.content.Context

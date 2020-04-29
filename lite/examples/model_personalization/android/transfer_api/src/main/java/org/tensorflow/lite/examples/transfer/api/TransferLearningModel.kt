@@ -363,14 +363,7 @@ class TransferLearningModel(modelLoader: ModelLoader, classes: Collection<String
                     val fromIndex = nextIndex
                     val toIndex = nextIndex + trainBatchSize
                     nextIndex = toIndex
-//                    if (toIndex >= trainingSamples.size) {
-//                        // To keep batch size consistent, last batch may include some elements from the
-//                        // next-to-last batch.
-//                        return@label trainingSamples.subList(
-//                                trainingSamples.size - trainBatchSize, trainingSamples.size)
-//                    } else {
-//                        return@label trainingSamples.subList(fromIndex, toIndex)
-//                    }
+
                     return@label if(toIndex >= trainingSamples.size)
                         trainingSamples.subList(trainingSamples.size - trainBatchSize, trainingSamples.size)
                     else trainingSamples.subList(fromIndex, toIndex)

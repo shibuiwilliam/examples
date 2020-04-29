@@ -267,8 +267,6 @@ class CameraFragment : Fragment() {
                             when (trainingState) {
                                 TrainingState.STARTED -> {
                                     tlModel!!.enableTraining(cLossConsumer as LossConsumer)
-
-//                                    tlModel!!.enableTraining(LossConsumer { epoch: Int, loss: Float -> viewModel!!.setLastLoss(loss) })
                                     if (!viewModel!!.inferenceSnackbarWasDisplayed.value!!) {
                                         Snackbar.make(
                                                 activity!!.findViewById(R.id.classes_bar),
