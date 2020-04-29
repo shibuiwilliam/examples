@@ -67,7 +67,7 @@ class PermissionsFragment : Fragment() {
      * Should be implemented by the host activity to get notified about permissions being acquired.
      */
     interface PermissionsAcquiredListener {
-        fun onPermissionsAcquired()
+        fun onPermissionsAcquired(){}
     }
 
     companion object {
