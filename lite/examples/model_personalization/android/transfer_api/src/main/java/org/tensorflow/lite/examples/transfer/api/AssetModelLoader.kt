@@ -12,7 +12,7 @@ import java.nio.MappedByteBuffer
 import java.nio.channels.FileChannel
 
 /** Handles loading various parts of the model stored as a directory under Android assets.  */
-class AssetModelLoader(context: Context, private val directoryName: String) : ModelLoader {
+open class AssetModelLoader(context: Context, private val directoryName: String) : ModelLoader {
     private val assetManager: AssetManager
 
     /**
@@ -26,7 +26,7 @@ class AssetModelLoader(context: Context, private val directoryName: String) : Mo
 
     @Throws(IOException::class)
     protected fun loadMappedFile(filePath: String): MappedByteBuffer {
-        val fileDescriptor = assetManager.openFd(directoryName + "/" + filePath)
+        val fileDescriptor = assetManager.openFd("${directoryName}/${filePath}")
         val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
         val fileChannel = inputStream.channel
         val startOffset = fileDescriptor.startOffset
